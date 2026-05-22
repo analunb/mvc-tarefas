@@ -1,0 +1,19 @@
+Projeto MVC - Tarefas com Paginação
+
+Para instalar as dependências:
+
+npm install
+
+Tecnologias utilizadas:
+- Node.js
+- Express
+- MySQL
+- MVC
+
+Alterações realizadas:
+- Separação das funcionalidades do router.js
+- Criação do tarefasController.js
+- Organização da arquitetura MVC
+
+GitHub do projeto:
+https://github.com/analunb/mvc-tarefas
