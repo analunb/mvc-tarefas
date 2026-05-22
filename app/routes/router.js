@@ -1,128 +1,20 @@
 var express = require("express");
 var router = express.Router();
-const { tarefasModel } = require("../models/tarefasModel"); //usar sempre o {}
-const moment = require("moment");
-moment.locale('pt-br');
 
-router.get("/", async function (req, res) {
-    res.locals.moment = moment;
-    try {
-        const result = await tarefasModel.findAll();
-        console.log(result)
-        res.render("pages/index", { listaTarefas: result })
-    } catch (erro) {
-        console.log(erro);
-    }
-});
+const tarefasController = require("../controllers/tarefasController");
 
+router.get("/", tarefasController.listar);
 
-router.get("/nova-tarefa", (req, res) => {
-    res.locals.moment = moment;
-    res.render("pages/cadastro",
-        {
-            tituloPagina: "Cadastro de Tarefas", tituloAba: "Cadastro",
-            tarefa: {
-                id_tarefa: 0, nome_tarefa: "",
-                prazo_tarefa: "", situacao_tarefa: 1
-            }
-        });
-});
+router.get("/nova-tarefa", tarefasController.novaTarefa);
 
-router.post("/manter-tarefa", async (req, res) => {
-    const objDados = {
-        id : req.body.id,
-        nome: req.body.nome,
-        prazo: req.body.prazo,
-        situacao: req.body.situacao
-    }
+router.post("/manter-tarefa", tarefasController.manterTarefa);
 
-    try {
-        if(objDados.id == 0){
-            const result = await tarefasModel.hcreate(objDados);  
-        }else{
-            const result = await tarefasModel.update(objDados);  
-        }
-        
-        res.redirect("/");
-    } catch (erro) {
-        console.log(erro);
-    }
-})
+router.get("/editar", tarefasController.editar);
 
+router.get("/excluir", tarefasController.excluir);
 
-router.get("/editar", async (req, res) => {
-    res.locals.moment = moment;
-    //recuperando a querystring
-    const id = req.query.id;
-    try {
-        const result = await tarefasModel.findById(id);
-        res.render("pages/cadastro",
-            {
-                tituloPagina: "Alterar Tarefa", tituloAba: "Edição de Tarefa",
-                tarefa: result[0]
-            });
-    } catch (erro) {
-        console.log(erro)
-    }
+router.get("/mostrar-excluidas", tarefasController.mostrarExcluidas);
 
-});
-
-
-router.get("/teste-insert", async (req, res) => {
-
-    const objDados = {
-        nome: "limpar gabinete PC",
-        prazo: "2026-03-23"
-    }
-    try {
-        const result = await tarefasModel.hcreate(objDados);
-        res.send(result);
-    } catch (erro) {
-        console.log(erro);
-    }
-});
-
-//exclusão física - hard delete
-router.get("/teste-delete", async (req, res) => {
-    const id = 5;
-     try {
-        const result = await tarefasModel.hdelete(id);
-        res.send(result);
-    } catch (erro) {
-        console.log(erro);
-    }
-})
-
-//exclusão lógica - soft delete
-router.get("/excluir", async (req, res) => {
-    const id = req.query.id;
-     try {
-        const result = await tarefasModel.sdelete(id);
-        res.redirect("/");
-    } catch (erro) {
-        console.log(erro);
-    }   
-})
-
-router.get("/mostrar-excluidas", async function (req, res) {
-    res.locals.moment = moment;
-    try {
-        const result = await tarefasModel.showDeleted();
-        console.log(result)
-        res.render("pages/index", { listaTarefas: result })
-    } catch (erro) {
-        console.log(erro);
-    }
-});
-
-router.get("/restaurar", async (req, res) => {
-    const id = req.query.id;
-    try {
-        const result = await tarefasModel.screate(id);
-        res.redirect("/");
-    } catch (erro) {
-        console.log(erro);
-    }
-});
+router.get("/restaurar", tarefasController.restaurar);
 
 module.exports = router;
